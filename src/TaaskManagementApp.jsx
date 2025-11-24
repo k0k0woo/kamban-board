@@ -9,7 +9,6 @@ const ACTIVE_STATUSES = ['Opened', 'In Progress', 'Completed'];
 // Date Formatting Utility
 const formatDate = (timestamp) => {
   if (!timestamp) return 'N/A';
-  // Ensure timestamp is a number, as it comes from localStorage now
   const date = new Date(Number(timestamp)); 
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
@@ -49,7 +48,7 @@ const Modal = ({ isOpen, onClose, children, title, size = 'max-w-lg' }) => {
 };
 
 
-// Component for a single Task Card
+// Component for a single Task Card (Active Kanban)
 const TaskCard = React.memo(({ task, onStatusChange, onDeleteTask }) => {
   // Hooks MUST be called first, before any conditional return
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -292,7 +291,7 @@ const NewTaskForm = React.memo(({ onAddTask, onTaskCreated }) => {
 });
 
 // Component for viewing archived tasks
-const ArchivedTasksModal = ({ isOpen, onClose, archivedTasks }) => {
+const ArchivedTasksModal = ({ isOpen, onClose, archivedTasks, onDeleteTask }) => { // 1. Added onDeleteTask
   const [sortBy, setSortBy] = useState('dueDate');
   const [searchQuery, setSearchQuery] = useState('');
   const [completedAfter, setCompletedAfter] = useState(''); // Date string for filtering
@@ -331,6 +330,15 @@ const ArchivedTasksModal = ({ isOpen, onClose, archivedTasks }) => {
       return 0;
     });
   }, [filteredTasks, sortBy]);
+  
+  // Confirmation state for archived deletion
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null); 
+
+  const handleDeleteConfirmed = useCallback((id) => {
+    onDeleteTask(id);
+    setConfirmDeleteId(null);
+  }, [onDeleteTask]);
+
 
   return (
     <Modal 
@@ -385,15 +393,45 @@ const ArchivedTasksModal = ({ isOpen, onClose, archivedTasks }) => {
             <p className="text-center text-gray-500 p-8 italic">No tasks match the current filter criteria.</p>
           ) : (
             sortedTasks.map(task => (
-              <div key={task.id} className="p-3 bg-white border border-gray-200 rounded-lg shadow-md flex justify-between items-center transition hover:shadow-lg">
+              <div key={task.id} className="p-3 bg-white border border-gray-200 rounded-lg shadow-md flex justify-between items-start transition hover:shadow-lg">
                 <div className="flex-1 min-w-0 pr-4 text-left">
                   <h4 className="font-semibold text-gray-900">{task.title}</h4>
                   <p className="text-xs text-gray-600 truncate max-w-lg">{task.description}</p>
                 </div>
-                <div className="text-right text-sm space-y-1 w-40">
-                  <p className="font-medium">Points: <span className="text-blue-600">{task.eta}</span></p>
-                  <p className="text-xs text-gray-700">Due: {formatDate(task.dueDate)}</p>
-                  <p className="text-xs text-green-700">Completed: {formatDate(task.completedDate)}</p>
+                
+                <div className="flex items-center space-x-3">
+                  <div className="text-right text-sm space-y-1 w-40">
+                    <p className="font-medium">Points: <span className="text-blue-600">{task.eta}</span></p>
+                    <p className="text-xs text-gray-700">Due: {formatDate(task.dueDate)}</p>
+                    <p className="text-xs text-green-700">Completed: {formatDate(task.completedDate)}</p>
+                  </div>
+                  
+                  {/* Delete Button and Confirmation */}
+                  {confirmDeleteId === task.id ? (
+                    <div className="flex space-x-2 p-1 bg-red-100 rounded-lg border border-red-300 text-sm font-medium">
+                      <button 
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="text-red-700 hover:text-red-900 px-2 transition"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteConfirmed(task.id)}
+                        className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDeleteId(task.id)}
+                      className="text-red-500 hover:text-red-700 transition p-1 rounded-full border border-gray-300"
+                      title="Permanently delete this archived task"
+                    >
+                      {/* Trash icon SVG */}
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                  )}
                 </div>
               </div>
             ))
@@ -451,7 +489,7 @@ export default function App() {
     setTasks(prevTasks => [...prevTasks, newTask]);
   }, []);
 
-  // Delete Task handler
+  // Delete Task handler (used by both Kanban and Archived Modal)
   const handleDeleteTask = useCallback((taskId) => {
     setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
   }, []);
@@ -769,17 +807,18 @@ export default function App() {
           />
         </Modal>
 
-        {/* Archived Tasks Modal */}
+        {/* Archived Tasks Modal (3. Passed handleDeleteTask) */}
         <ArchivedTasksModal 
           isOpen={isArchivedModalOpen}
           onClose={() => setIsArchivedModalOpen(false)}
           archivedTasks={archivedTasks} 
+          onDeleteTask={handleDeleteTask}
         />
 
         {/* Kanban Board */}
         <div className="pb-4">
           {/* Note: flex-col on mobile, md:flex-row on desktop to remove horizontal scroll */}
-          <div className="flex flex-col md:flex-row gap-6 p-3 justify-between">
+          <div className="flex flex-col md:flex-row gap-6 p-2 justify-between">
             {ACTIVE_STATUSES.map(status => (
               <KanbanColumn
                 key={status}
