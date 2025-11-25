@@ -124,6 +124,16 @@ const TaskCard = React.memo(({ task, onStatusChange, onDeleteTask, onToggleSubta
       onDragEnd={handleDragEnd}
     >
       <div className="flex justify-between items-start mb-2">
+
+        
+        {/* Delete Button */}
+        <button
+          onClick={() => setShowConfirmDelete(true)}
+          className="w-5 ml-0 bg-red-500 hover:bg-red-600 text-white font-semibold px-1 rounded-lg transition duration-150 ease-in-out shadow-md"
+        >
+            X
+        </button>
+
          {/* Title and Edit Button */}
         <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 border-b pb-1 border-gray-300 dark:border-gray-600 flex-1">
           {task.title}
@@ -217,26 +227,18 @@ const TaskCard = React.memo(({ task, onStatusChange, onDeleteTask, onToggleSubta
         <button
           onClick={handleMoveBackward}
           disabled={currentStatusIndex === 0}
-          className="w-1/3 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-extrabold py-2 px-3 rounded-lg transition duration-150 ease-in-out shadow-md disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-1/5 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-extrabold py-2 px-3 rounded-lg transition duration-150 ease-in-out shadow-md disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
           title="Move to Previous Status"
         >
           {/* Inline SVG for Left Arrow */}
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"></path></svg>
-        </button>
-
-        {/* Delete Button */}
-        <button
-          onClick={() => setShowConfirmDelete(true)}
-          className="w-1/3 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-3 rounded-lg transition duration-150 ease-in-out shadow-md"
-        >
-          Delete
         </button>
         
         {/* Next Status Button */}
         <button
           onClick={handleMoveForward}
           disabled={currentStatusIndex === ACTIVE_STATUSES.length - 1}
-          className="w-1/3 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-extrabold py-2 px-3 rounded-lg transition duration-150 ease-in-out shadow-md disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-1/5 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-extrabold py-2 px-3 rounded-lg transition duration-150 ease-in-out shadow-md disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
           title="Move to Next Status"
         >
           {/* Inline SVG for Right Arrow */}
