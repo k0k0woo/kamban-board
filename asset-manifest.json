@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/kamban-board/static/css/main.0aa775f1.css",
+    "main.js": "/kamban-board/static/js/main.e948eab3.js",
+    "static/js/453.893c8b5b.chunk.js": "/kamban-board/static/js/453.893c8b5b.chunk.js",
+    "index.html": "/kamban-board/index.html",
+    "main.0aa775f1.css.map": "/kamban-board/static/css/main.0aa775f1.css.map",
+    "main.e948eab3.js.map": "/kamban-board/static/js/main.e948eab3.js.map",
+    "453.893c8b5b.chunk.js.map": "/kamban-board/static/js/453.893c8b5b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0aa775f1.css",
+    "static/js/main.e948eab3.js"
+  ]
+}
